@@ -67,7 +67,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 
-	grunt.registerTask('default', ['uglify:dist', 'concat', 'less:dist']);
+	grunt.registerTask('default', ['uglify:dist', 'concat:libs', 'less:dist']);
 	grunt.registerTask('css', ['less:dist']);
 	grunt.registerTask('js', ['uglify:dist', 'concat']);
 };

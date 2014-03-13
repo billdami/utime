@@ -11,7 +11,9 @@
 		"keyword": "ut"
 	},
 	"permissions": [
-		"contextMenus"
+		"clipboardWrite",
+		"contextMenus",
+		"notifications"
 	],
 	"icons": {
 		"16": "images/clock_16.png",
