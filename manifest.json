@@ -1,28 +1,28 @@
 {
-	"name": "Utime",
-	"version": "3.0.0",
-	"manifest_version": 2,
-	"description": "Converts UNIX timestamps to human-readable dates and vice versa.",
-	"background": {
-		"page": "background.html",
-		"persistent": true
-	},
-	"omnibox": {
-		"keyword": "ut"
-	},
-	"permissions": [
-		"clipboardWrite",
-		"contextMenus",
-		"notifications"
-	],
-	"icons": {
-		"16": "images/clock_16.png",
-		"48": "images/clock_48.png",
-		"128": "images/clock_128.png"
-	},
-	"browser_action": {
-		"default_icon": "images/clock_19.png",
-		"default_title": "Convert Unix timestamp or date", 
-		"default_popup": "popup.html"
-	}
+    "name": "Utime",
+    "version": "3.0.0",
+    "manifest_version": 2,
+    "description": "Converts UNIX timestamps to human-readable dates and vice versa.",
+    "background": {
+        "page": "background.html",
+        "persistent": true
+    },
+    "omnibox": {
+        "keyword": "ut"
+    },
+    "permissions": [
+        "clipboardWrite",
+        "contextMenus",
+        "notifications"
+    ],
+    "icons": {
+        "16": "images/clock_16.png",
+        "48": "images/clock_48.png",
+        "128": "images/clock_128.png"
+    },
+    "browser_action": {
+        "default_icon": "images/clock_19.png",
+        "default_title": "Convert Unix timestamp or date", 
+        "default_popup": "popup.html"
+    }
 }
