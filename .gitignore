@@ -1,0 +1,15 @@
+build/
+
+# node
+node_modules/
+
+# sublime text
+*.sublime-workspace
+*.sublime-project
+
+# osx
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+

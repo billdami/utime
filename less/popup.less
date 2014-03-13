@@ -1,0 +1,145 @@
+/**
+ * popup styles
+ * 
+ */
+.container {
+	width: 320px;
+}
+
+.app-container {
+	background: #f6f6f6;
+}
+
+.input-groups {
+	padding: 2px 0;
+	max-height: 565px;
+	overflow-y: auto;
+}
+
+.input-group {
+	padding: 2px;
+	position: relative;
+
+	&-field {
+		position: relative;
+
+		&:first-child .input-group-control {
+			border-bottom: 0;
+			border-bottom-left-radius: 0px;
+			border-bottom-right-radius: 0px;
+			border-top-left-radius: 2px;
+			border-top-right-radius: 2px;
+		}
+	}
+
+	&-control {
+		width: 100%;
+		margin: 0;
+		padding: 10px 24px 10px 10px;
+		border: 1px solid #e6e6e6;
+		background-color: #fff;
+		font-size: 14px;
+		color: #333;
+		border-bottom-left-radius: 2px;
+		border-bottom-right-radius: 2px;
+
+		&:focus {
+			outline: none;
+		}
+
+		&.error {
+			color: #a94442;
+		}
+	}
+
+	&-close-btn {
+		position: absolute;
+		top: 2px;
+		right: 2px;
+		z-index: 2;
+		padding: 2px 4px;
+		min-width: 0;
+		font-size: 12px;
+		font-weight: 700;
+		border-radius: 0;
+		color: #c9c9c9;
+		box-shadow: none;
+		border-color: #e6e6e6;
+		border-top-right-radius: 2px;
+		border-bottom-left-radius: 2px;
+
+		&:hover {
+			color: #999;
+			border-color: #e6e6e6;
+		}
+	}
+}
+
+.toolbar {
+	padding: 2px;
+	background-color: #f0f0f0;
+	box-shadow: inset 0 1px 3px rgba(0,0,0,0.04);
+
+	&-bottom {
+		border-top: 1px solid #e6e6e6;
+		border-bottom-left-radius: 2px;
+		border-bottom-right-radius: 2px;
+	}
+}
+
+.close-btn {
+	font-size: 16px;
+	color: #c9c9c9;
+	line-height: 16px;
+	padding: 0;
+	min-width: 0;
+	border: 0;
+	background: transparent;
+	box-shadow: none;
+
+	&:hover, &:focus, &:active {
+		background: transparent;
+		box-shadow: none;
+		color: #999;
+	}
+}
+
+.kb-shortcuts {
+	margin: 0 0 20px 0;
+
+	dt {
+		width: 85px;
+		float: left;
+		clear: left;
+		text-align: right;
+		line-height: 19px;
+		margin-bottom: 6px;
+	}
+
+	dd {
+		line-height: 19px;
+		margin-left: 95px;
+		margin-bottom: 6px;
+	}
+}
+
+//mac cmd key entity: &#8984;
+.shortcut-key {
+	display: inline-block;
+	background-color: #f7f7f7;
+	border: 1px solid #ccc;
+	color: #555;
+	font-size: 11px;
+	line-height: 1.4;
+	text-shadow: 0 1px 0 #fff;
+	padding: 0.1em 0.6em;
+	margin: 0 0.1em;
+	white-space: nowrap;
+	box-shadow: 0 1px 0px rgba(0, 0, 0, 0.2), 0 0 0 2px #ffffff inset;
+	border-radius: 3px;
+}
+
+.help-tips {
+	list-style-type: square;
+	padding-left: 20px;
+}
