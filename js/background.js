@@ -23,13 +23,17 @@ var extBgPage = (function() {
                 onclick: this.proxy(this.handleContextMenuClick)
             });
 
-            //omnibox initialization
-            chrome.omnibox.setDefaultSuggestion({description: "Type a timestamp or date then press Enter to convert the value"});
+            //omnibox event handlers
             chrome.omnibox.onInputChanged.addListener(this.proxy(this.handleOmniboxChange));
             chrome.omnibox.onInputEntered.addListener(this.proxy(this.handleOmniboxSubmit));
+
+            chrome.omnibox.setDefaultSuggestion({
+                description: "Type a timestamp or date then press Enter to convert the value"
+            });
             
-            //notification button click handler (for copy to clipboard function)
+            //notification event handlers
             chrome.notifications.onButtonClicked.addListener(this.proxy(this.handleNotificationBtnClick));
+            chrome.notifications.onClosed.addListener(this.proxy(this.handleNotificationClose));
             return this;
         },
 
@@ -58,11 +62,17 @@ var extBgPage = (function() {
                 timestamp = this.utime.convertDate(text);
 
                 if(date !== false) {
-                    suggestions.push({content: this.convertedToken + date, description: '<match>' + date + '</match> <dim>Date</dim>'});
+                    suggestions.push({
+                        content: this.convertedToken + date, 
+                        description: '<match>' + date + '</match> <dim>Date</dim>'
+                    });
                 }
 
                 if(timestamp !== false) {
-                    suggestions.push({content: this.convertedToken + timestamp, description: '<match>' + timestamp + '</match> <dim>Timestamp</dim>'});
+                    suggestions.push({
+                        content: this.convertedToken + timestamp, 
+                        description: '<match>' + timestamp + '</match> <dim>Timestamp</dim>'
+                    });
                 }
             }
 
@@ -93,6 +103,11 @@ var extBgPage = (function() {
             }
         },
 
+        handleNotificationClose: function(notifId) {
+            //delete the stored notification value once it has been closed
+            delete this.notifications[notifId];
+        },
+
         createNotification: function(result) {
             var showCopyBtn = false;
 
@@ -105,12 +120,12 @@ var extBgPage = (function() {
 
             chrome.notifications.create('', {
                 type: 'basic',
-                iconUrl: 'images/clock_48.png',
+                iconUrl: 'images/icon-48.png',
                 title: 'Conversion result',
                 message: result,
                 buttons: showCopyBtn ? [{title: 'Copy to clipboard'}] : []
-            }, this.proxy(function(notificationId) {
-                this.notifications[notificationId] = result;
+            }, this.proxy(function(notifId) {
+                this.notifications[notifId] = result;
             }));
         },
 

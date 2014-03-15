@@ -71,7 +71,8 @@ Utime.prototype = {
 
             output = date.toString(this.getOption('dateOutputFormat'));
             
-            if(this.getOption('timeOutputFormat') != 'none' && this.getOption('dateOutputFormat') != 'yyyy-MM-ddTHH:mm:ss') {
+            if(this.getOption('timeOutputFormat') != 'none' && 
+                this.getOption('dateOutputFormat') != 'yyyy-MM-ddTHH:mm:ss') {
                 output += ' ' + date.toString(this.getOption('timeOutputFormat'));
             }
         }

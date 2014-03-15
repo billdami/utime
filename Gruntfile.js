@@ -69,5 +69,5 @@ module.exports = function(grunt) {
 
     grunt.registerTask('default', ['uglify:dist', 'concat:libs', 'less:dist']);
     grunt.registerTask('css', ['less:dist']);
-    grunt.registerTask('js', ['uglify:dist', 'concat']);
+    grunt.registerTask('js', ['uglify:dist', 'concat:libs']);
 };

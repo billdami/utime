@@ -10,7 +10,8 @@ var extPopup = (function() {
 
         init: function() {
             chrome.runtime.getBackgroundPage(this.proxy(function(bgWin) {
-                var existingGroups = bgWin.inputGroups || [{id: 0, topValue: null, bottomValue: null, lastTarget: 'top'}];
+                var defaultGroups = [{id: 0, topValue: null, bottomValue: null, lastTarget: 'top'}],
+                    existingGroups = bgWin.inputGroups || defaultGroups;
                 this.bgWin = bgWin;
                 this.utime = new Utime();
                 this.currentLocation = 'app';
@@ -104,7 +105,10 @@ var extPopup = (function() {
 
                 //insert the current timestamp/date when enter is pressed on an empty input
                 if(e.which === 13 && $.trim(el.val()).length < 1) {
-                    newValue = (el.hasClass('input-0') && this.utime.getOption('inputMode') != 'date-timestamp') ? this.utime.getCurrentTimestamp() : this.utime.getCurrentDate();
+                    newValue = (el.hasClass('input-0') && this.utime.getOption('inputMode') != 'date-timestamp') ? 
+                        this.utime.getCurrentTimestamp() : 
+                        this.utime.getCurrentDate();
+
                     el.val(newValue);
                 }
 
@@ -203,7 +207,7 @@ var extPopup = (function() {
 
             if(target === 'top') {
                 topValue = $.trim(topInput.val());
-                if(forceUpdate === true || topValue !== this.bgWin.inputGroups[groupIndex].topValue) {
+                if(forceUpdate === true || topValue != this.bgWin.inputGroups[groupIndex].topValue) {
                     bottomValue = this.convertValue(topValue, 'top');
                     bottomInput.val(this.getDisplayedValue(bottomValue, 'bottom'));
                     bottomInput.toggleClass('error', (bottomValue === false));
@@ -213,7 +217,7 @@ var extPopup = (function() {
                 }
             } else {
                 bottomValue = $.trim(bottomInput.val());
-                if(forceUpdate === true || bottomValue !== this.bgWin.inputGroups[groupIndex].bottomValue) {
+                if(forceUpdate === true || bottomValue != this.bgWin.inputGroups[groupIndex].bottomValue) {
                     topValue = this.convertValue(bottomValue, 'bottom');
                     topInput.val(this.getDisplayedValue(topValue, 'top'));
                     topInput.toggleClass('error', (topValue === false));
@@ -372,14 +376,16 @@ var extPopup = (function() {
                 topPlaceholder = this.getPlaceholder('top'),
                 bottomPlaceholder = this.getPlaceholder('bottom');
 
-            html = '<div class="input-group" id="input-group-' + id + '">'+
-                        '<div class="input-group-field">'+
-                            '<input type="text" class="input-group-control input-0' + (topError ? ' error' : '') + '" placeholder="' + topPlaceholder + '" value="' + topText + '" />'+
-                        '</div>'+
-                        '<div class="input-group-field">'+
-                            '<input type="text" class="input-group-control input-1' + (bottomError ? ' error' : '') + '" placeholder="' + bottomPlaceholder + '" value="' + bottomText + '" />'+
-                        '</div>'+
-                        '<button type="button" class="btn input-group-close-btn" title="Remove input group">&times;</button>'+
+            html = '<div class="input-group" id="input-group-' + id + '">' +
+                        '<div class="input-group-field">' +
+                            '<input type="text" class="input-group-control input-0' + (topError ? ' error' : '') + '"' +
+                                ' placeholder="' + topPlaceholder + '" value="' + topText + '" />'+
+                        '</div>' +
+                        '<div class="input-group-field">' +
+                            '<input type="text" class="input-group-control input-1' + (bottomError ? ' error' : '') + '"' + 
+                                ' placeholder="' + bottomPlaceholder + '" value="' + bottomText + '" />' +
+                        '</div>' +
+                        '<button type="button" class="btn input-group-close-btn" title="Remove input group">&times;</button>' +
                     '</div>';
 
             return $(html);
