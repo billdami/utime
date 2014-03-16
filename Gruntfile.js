@@ -59,6 +59,9 @@ module.exports = function(grunt) {
                 files: ['less/*.less'],
                 tasks: ['less:dev']
             }
+        },
+        'exec': {
+            'zip': 'zip -r releases/<%= pkg.name %>-v<%= pkg.version %>.zip ./dist/ ./images/ manifest.json background.html popup.html'
         }
     });
 
@@ -66,8 +69,10 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-exec');
 
     grunt.registerTask('default', ['uglify:dist', 'concat:libs', 'less:dist']);
     grunt.registerTask('css', ['less:dist']);
     grunt.registerTask('js', ['uglify:dist', 'concat:libs']);
+    grunt.registerTask('zip', ['exec:zip']);
 };
