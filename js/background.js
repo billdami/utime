@@ -120,7 +120,7 @@ var extBgPage = (function() {
 
             chrome.notifications.create('', {
                 type: 'basic',
-                iconUrl: 'images/icon-48.png',
+                iconUrl: 'images/icon-80.png',
                 title: 'Conversion result',
                 message: result,
                 buttons: showCopyBtn ? [{title: 'Copy to clipboard'}] : []
