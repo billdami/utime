@@ -18,6 +18,7 @@ var extPopup = (function() {
                 this.storeEls();
                 this.addListeners();
                 this.bgWin.inputGroups = [];
+                this.resize();
                 this.populateOptionsForm();
                 
                 existingGroups.forEach(function(grp, index) {

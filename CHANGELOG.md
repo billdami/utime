@@ -1,5 +1,9 @@
 # utime changelog
 
+### 3.0.1 (July 30, 2014)
+
+* Fix for issue introduced by the latest version of Chrome that was causing the popup height to be incorrect upon opening
+
 ### 3.0.0 (March 14, 2014)
 
 * Complete overhaul of the popup user interface

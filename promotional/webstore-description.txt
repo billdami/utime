@@ -34,6 +34,9 @@ PRO TIPS!
 
 CHANGELOG
 ----------------------------------------
+v3.0.1 (July 30, 2014)
+ * Fix for issue introduced by the latest version of Chrome that was causing the popup height to be incorrect upon opening
+
 v3.0.0 (March 14, 2014)
  * IMPORTANT NOTE: Users who updated from v2.0.6 will need to re-apply any custom settings, as the options have been reset (sorry!)
  * Complete overhaul of the popup user interface
