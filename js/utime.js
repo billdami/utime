@@ -82,7 +82,7 @@ Utime.prototype = {
                 output += ' ' + date.toString(this.getOption('timeOutputFormat'));
             }
         }
-        
+        $("#message-container").html(outputtext);
         return output;
     },
 
