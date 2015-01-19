@@ -47,6 +47,7 @@ Utime.prototype = {
     convertTimestamp: function(input) {
         var output = '',
             date;
+        var outputtext = '';
 
         if(!input || input === '') {
             return output;
@@ -58,7 +59,12 @@ Utime.prototype = {
             return false;
         }
 
-        if(this.getOption('timestampUnit') === 's') {
+        if(input >= 100000000000000){
+            outputtext = "<i>Assuming that this timestamp is in microseconds (1/1,000,000 second)</i>";  
+            input=Math.round(input/1000);
+        }else if(input >= 100000000000){
+            outputtext = "<i>Assuming that this timestamp is in milliseconds</i>";   
+        }else{
             input = input * 1000;
         }
 
@@ -76,7 +82,7 @@ Utime.prototype = {
                 output += ' ' + date.toString(this.getOption('timeOutputFormat'));
             }
         }
-        
+        $("#message-container").html(outputtext);
         return output;
     },
 
