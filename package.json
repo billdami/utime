@@ -1,6 +1,6 @@
 {
   "name": "utime",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "Converts UNIX timestamps to human-readable dates and vice versa.",
   "author": "Bill Dami",
   "devDependencies": {

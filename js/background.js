@@ -38,8 +38,8 @@ var extBgPage = (function() {
         },
 
         handleContextMenuClick: function(info, tab) {
-            var input,
-                result;
+            var input;
+            var result;
 
             input = $.trim(info.selectionText);
 
@@ -52,9 +52,9 @@ var extBgPage = (function() {
         },
 
         handleOmniboxChange: function(text, suggest) {
-            var suggestions = [],
-                date,
-                timestamp;
+            var suggestions = [];
+            var date;
+            var timestamp;
         
             text = $.trim(text);
             if(text.length > 0) {

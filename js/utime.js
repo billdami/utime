@@ -45,8 +45,8 @@ Utime.prototype = {
     },
 
     convertTimestamp: function(input) {
-        var output = '',
-            date;
+        var output = '';
+        var date;
 
         if(!input || input === '') {
             return output;
@@ -81,14 +81,15 @@ Utime.prototype = {
     },
 
     convertInput: function(input) {
-        var output = false,
-            isNumeric = (typeof input === 'string' && input.search(/[^0-9]/) === -1);
+        var output = false;
+        var tsRegex = /^-?[0-9]+$/;
+        var isTimestamp = (typeof input === 'string' && tsRegex.test(input));
 
-        if(!isNumeric) {
+        if(!isTimestamp) {
             output = this.convertDate(input);
         }
 
-        if(output === false && isNumeric) {
+        if(output === false && isTimestamp) {
             output = this.convertTimestamp(input);
         }
 
@@ -96,11 +97,11 @@ Utime.prototype = {
     },
 
     applyTimezoneOffset: function(date, offset) {
-        var localTime, 
-            localOffset, 
-            utcTime, 
-            adjTime, 
-            msOffset;
+        var localTime;
+        var localOffset;
+        var utcTime; 
+        var adjTime;
+        var msOffset;
 
         if(typeof date.getTime !== 'function' || typeof date.getTimezoneOffset !== 'function') {
             return date;
