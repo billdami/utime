@@ -20,8 +20,9 @@ const extBgPage = (function() {
                 id: 'utime-context-convert',
                 title: 'Convert with Utime',
                 contexts: ['selection'],
-                onclick: this.handleContextMenuClick.bind(this)
             });
+
+            chrome.contextMenus.onClicked.addListener(this.handleContextMenuClick.bind(this));
 
             //omnibox event handlers
             chrome.omnibox.onInputChanged.addListener(this.handleOmniboxChange.bind(this));
@@ -139,7 +140,7 @@ const extBgPage = (function() {
 
             const notifId = await chrome.notifications.create('', {
                 type: 'basic',
-                iconUrl: 'images/icon-80.png',
+                iconUrl: chrome.runtime.getURL('images/icon-80.png'),
                 title: 'Conversion result',
                 message: result,
                 buttons: showCopyBtn ? [{title: 'Copy to clipboard'}] : []
