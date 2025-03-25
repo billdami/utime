@@ -1,11 +1,10 @@
 {
     "name": "Utime",
-    "version": "3.0.3",
-    "manifest_version": 2,
+    "version": "4.0.0",
+    "manifest_version": 3,
     "description": "Converts UNIX timestamps to human-readable dates and vice versa.",
     "background": {
-        "page": "background.html",
-        "persistent": true
+        "service_worker": "dist/utime-background.js"
     },
     "omnibox": {
         "keyword": "ut"
@@ -13,14 +12,20 @@
     "permissions": [
         "clipboardWrite",
         "contextMenus",
-        "notifications"
+        "notifications",
+        "offscreen",
+        "storage"
     ],
     "icons": {
         "16": "images/icon-16.png",
+        "19": "images/icon-19.png",
+        "38": "images/icon-38.png",
         "48": "images/icon-48.png",
-        "128": "images/icon-128.png"
+        "80": "images/icon-80.png",
+        "128": "images/icon-128.png",
+        "256": "images/icon-256.png"
     },
-    "browser_action": {
+    "action": {
         "default_icon": {
             "19": "images/icon-19.png",
             "38": "images/icon-38.png"

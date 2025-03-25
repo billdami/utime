@@ -9,7 +9,8 @@ module.exports = function(grunt) {
                 },
                 files: {
                     'dist/utime-popup.js': ['js/utime.js', 'js/popup.js'],
-                    'dist/utime-background.js': ['js/utime.js', 'js/background.js']
+                    'dist/utime-background.js': ['js/utime.js', 'js/background.js'],
+                    'dist/offscreen.js': ['js/offscreen.js']
                 }
             }
         },
@@ -25,13 +26,14 @@ module.exports = function(grunt) {
                 },
                 files: {
                     'dist/utime-popup.js': ['libs/jquery.js', 'libs/date.js', 'dist/utime-popup.js'],
-                    'dist/utime-background.js': ['libs/jquery.js', 'libs/date.js', 'dist/utime-background.js']
+                    'dist/utime-background.js': ['libs/date.js', 'dist/utime-background.js']
                 }
             },
             'dev': {
                 files: {
                     'dist/utime-popup.js': ['js/utime.js', 'js/popup.js', 'js/options.js'],
-                    'dist/utime-background.js': ['js/utime.js', 'js/background.js']
+                    'dist/utime-background.js': ['js/utime.js', 'js/background.js'],
+                    'dist/offscreen.js': ['js/offscreen.js']
                 }
             },
         },
@@ -61,7 +63,7 @@ module.exports = function(grunt) {
             }
         },
         'exec': {
-            'zip': 'zip -r releases/<%= pkg.name %>-v<%= pkg.version %>.zip ./dist/ ./images/ manifest.json background.html popup.html'
+            'zip': 'zip -r releases/<%= pkg.name %>-v<%= pkg.version %>.zip ./dist/ ./images/ manifest.json offscreen.html popup.html'
         }
     });
 

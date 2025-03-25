@@ -1,8 +1,8 @@
-/**
- * background page
- * 
- */
-var extBgPage = (function() {
+const OFFSCREEN_PATH = 'offscreen.html';
+
+let creatingOffscreenDoc = null;
+
+const extBgPage = (function() {
 
     var BackgroundPage = function() {
         this.notifications = {};
@@ -20,28 +20,46 @@ var extBgPage = (function() {
                 id: 'utime-context-convert',
                 title: 'Convert with Utime',
                 contexts: ['selection'],
-                onclick: this.proxy(this.handleContextMenuClick)
             });
 
+            chrome.contextMenus.onClicked.addListener(this.handleContextMenuClick.bind(this));
+
             //omnibox event handlers
-            chrome.omnibox.onInputChanged.addListener(this.proxy(this.handleOmniboxChange));
-            chrome.omnibox.onInputEntered.addListener(this.proxy(this.handleOmniboxSubmit));
+            chrome.omnibox.onInputChanged.addListener(this.handleOmniboxChange.bind(this));
+            chrome.omnibox.onInputEntered.addListener(this.handleOmniboxSubmit.bind(this));
 
             chrome.omnibox.setDefaultSuggestion({
                 description: "Type a timestamp or date then press Enter to convert the value"
             });
             
             //notification event handlers
-            chrome.notifications.onButtonClicked.addListener(this.proxy(this.handleNotificationBtnClick));
-            chrome.notifications.onClosed.addListener(this.proxy(this.handleNotificationClose));
+            chrome.notifications.onButtonClicked.addListener(this.handleNotificationBtnClick.bind(this));
+            chrome.notifications.onClosed.addListener(this.handleNotificationClose.bind(this));
+
+            //general message handling
+            chrome.runtime.onMessage.addListener(this.handleMessages.bind(this));
             return this;
+        },
+
+        handleMessages: async function(message) {
+            if (message.target !== 'background') {
+                return;
+            }
+        
+            switch (message.type) {
+                case 'update-options':
+                    await this.utime.loadOptions();
+                    break;
+                default:
+                    console.warn(`Unexpected message type received: '${message.type}'.`);
+            }
         },
 
         handleContextMenuClick: function(info, tab) {
             var input;
             var result;
 
-            input = $.trim(info.selectionText);
+            input = (info.selectionText || '').trim();
 
             if(input.length < 1) {
                 return;
@@ -56,7 +74,8 @@ var extBgPage = (function() {
             var date;
             var timestamp;
         
-            text = $.trim(text);
+            text = (text || '').trim();
+
             if(text.length > 0) {
                 date = this.utime.convertTimestamp(text);
                 timestamp = this.utime.convertDate(text);
@@ -82,7 +101,8 @@ var extBgPage = (function() {
         handleOmniboxSubmit: function(text) {
             var result;
 
-            text = $.trim(text);
+            text = (text || '').trim();
+
             if(text.length < 1) {
                 return;
             }
@@ -108,7 +128,7 @@ var extBgPage = (function() {
             delete this.notifications[notifId];
         },
 
-        createNotification: function(result) {
+        createNotification: async function(result) {
             var showCopyBtn = false;
 
             if(!result) {
@@ -118,27 +138,49 @@ var extBgPage = (function() {
                 showCopyBtn = true;
             }
 
-            chrome.notifications.create('', {
+            const notifId = await chrome.notifications.create('', {
                 type: 'basic',
-                iconUrl: 'images/icon-80.png',
+                iconUrl: chrome.runtime.getURL('images/icon-80.png'),
                 title: 'Conversion result',
                 message: result,
                 buttons: showCopyBtn ? [{title: 'Copy to clipboard'}] : []
-            }, this.proxy(function(notifId) {
-                this.notifications[notifId] = result;
-            }));
+            });
+
+            this.notifications[notifId] = result;
         },
 
-        copyToClipboard: function(content) {
-            var textarea = $('#clipboard-proxy');
-            textarea.val(content);
-            textarea.select();
-            document.execCommand('copy');
-            textarea.val('');
+        setupOffscreenDocument: async function() {
+            const offscreenUrl = chrome.runtime.getURL(OFFSCREEN_PATH);
+            const existing = await chrome.runtime.getContexts({
+                contextTypes: ['OFFSCREEN_DOCUMENT'],
+                documentUrls: [offscreenUrl]
+            });
+
+            if (existing.length > 0) {
+                return;
+            }
+
+            if (creatingOffscreenDoc) {
+                await creatingOffscreenDoc;
+            } else {
+                creatingOffscreenDoc = chrome.offscreen.createDocument({
+                    url: OFFSCREEN_PATH,
+                    reasons: [chrome.offscreen.Reason.CLIPBOARD],
+                    justification: 'Write text to the clipboard.'
+                });
+
+                await creatingOffscreenDoc;
+                creatingOffscreenDoc = null;
+            }
         },
 
-        proxy: function(fn) {
-            return $.proxy(fn, this);
+        copyToClipboard: async function(value) {
+            await this.setupOffscreenDocument();
+            chrome.runtime.sendMessage({
+                type: 'copy-data-to-clipboard',
+                target: 'offscreen-doc',
+                data: value
+            });
         }
     };
 
