@@ -11,15 +11,16 @@ var extPopup = (function() {
         init: async function() {
             this.utime = new Utime();
             await this.utime.loadOptions();
-
-            const inputGroups = await this.loadInputGroups();
             
             this.currentLocation = 'app';
             this.storeEls();
             this.addListeners();
             this.resize();
             this.populateOptionsForm();
-            inputGroups.forEach((grp) => this.addInputGroup(grp.topValue, grp.bottomValue, grp.lastTarget));
+            
+            const existingGroups = await this.loadInputGroups();
+            await this.updateInputGroups([]);
+            existingGroups.forEach((grp) => this.addInputGroup(grp.topValue, grp.bottomValue, grp.lastTarget));
 
             return this;
         },
@@ -29,6 +30,7 @@ var extPopup = (function() {
             const defaultGroups = [{id: 0, topValue: null, bottomValue: null, lastTarget: 'top'}];
 
             this.inputGroups = inputGroups ? JSON.parse(inputGroups) : defaultGroups;
+            console.log('loaded input groups', this.inputGroups);
             return this.inputGroups;
         },
 
@@ -38,13 +40,13 @@ var extPopup = (function() {
         },
 
         addInputGroupElement: async function(inputGroup) {
-            this.inputGroups = [...this.inputGroups, inputGroup];
-            await this.updateInputGroups(this.inputGroups);
+            await this.updateInputGroups([...this.inputGroups, inputGroup]);
+            console.log(`added`, inputGroup, this.inputGroups);
         },
 
         removeInputGroupElement: async function(index) {
-            this.inputGroups = this.inputGroups.toSpliced(index, 1);
-            await this.updateInputGroups(this.inputGroups);
+            await this.updateInputGroups(this.inputGroups.toSpliced(index, 1));
+            console.log(`removed ${index}`, this.inputGroups);
         },
 
         storeEls: function() {
@@ -245,6 +247,8 @@ var extPopup = (function() {
                     this.inputGroups[groupIndex].lastTarget = 'bottom';
                 }
             }
+
+            this.updateInputGroups(this.inputGroups);
         },
 
         convertValue: function(value, source) {
@@ -364,16 +368,7 @@ var extPopup = (function() {
         },
 
         indexOfGroup: function(id) {
-            var index = -1;
-
-            for(var i = 0; i < this.inputGroups.length; i++) {
-                if(this.inputGroups[i].id === id) {
-                    index = i;
-                    break;
-                }
-            }
-
-            return index;
+            return this.inputGroups.findIndex((g) => g.id === id);
         },
 
         getNextInputGroupId: function() {
