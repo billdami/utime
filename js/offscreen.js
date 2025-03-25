@@ -2,8 +2,6 @@
 chrome.runtime.onMessage.addListener(handleMessages);
 
 async function handleMessages(message) {
-    console.log('MESSAGE', message);
-
     if (message.target !== 'offscreen-doc') {
         return;
     }

@@ -30,7 +30,6 @@ var extPopup = (function() {
             const defaultGroups = [{id: 0, topValue: null, bottomValue: null, lastTarget: 'top'}];
 
             this.inputGroups = inputGroups ? JSON.parse(inputGroups) : defaultGroups;
-            console.log('loaded input groups', this.inputGroups);
             return this.inputGroups;
         },
 
@@ -41,12 +40,10 @@ var extPopup = (function() {
 
         addInputGroupElement: async function(inputGroup) {
             await this.updateInputGroups([...this.inputGroups, inputGroup]);
-            console.log(`added`, inputGroup, this.inputGroups);
         },
 
         removeInputGroupElement: async function(index) {
             await this.updateInputGroups(this.inputGroups.toSpliced(index, 1));
-            console.log(`removed ${index}`, this.inputGroups);
         },
 
         storeEls: function() {
