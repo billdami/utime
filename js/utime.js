@@ -149,21 +149,21 @@ Utime.prototype = {
         return this._options;
     },
 
-    loadOptions: function() {
-        var storedOpts = localStorage.getItem('utime.options');
-        this._options = storedOpts ? JSON.parse(storedOpts) : $.extend({}, this.defaultOptions);
+    loadOptions: async function() {
+        const { options } = await chrome.storage.local.get(['options']);
+        this._options = options ? JSON.parse(options) : { ...this.defaultOptions };
         this.updateDateOptions();
     },
 
-    updateOption: function(key, value) {
+    updateOption: async function(key, value) {
         this._options[key] = value;
-        localStorage.setItem('utime.options', JSON.stringify(this._options));
+        await chrome.storage.local.set({ options: JSON.stringify(this._options) });
         this.updateDateOptions();
     },
 
-    updateOptions: function(opts) {
+    updateOptions: async function(opts) {
         this._options = opts;
-        localStorage.setItem('utime.options', JSON.stringify(this._options));
+        await chrome.storage.local.set({options: JSON.stringify(this._options) });
         this.updateDateOptions();
     },
 

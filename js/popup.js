@@ -8,25 +8,43 @@ var extPopup = (function() {
 
     Popup.prototype = {
 
-        init: function() {
-            chrome.runtime.getBackgroundPage(this.proxy(function(bgWin) {
-                var defaultGroups = [{id: 0, topValue: null, bottomValue: null, lastTarget: 'top'}],
-                    existingGroups = bgWin.inputGroups || defaultGroups;
-                this.bgWin = bgWin;
-                this.utime = new Utime();
-                this.currentLocation = 'app';
-                this.storeEls();
-                this.addListeners();
-                this.bgWin.inputGroups = [];
-                this.resize();
-                this.populateOptionsForm();
-                
-                existingGroups.forEach(function(grp, index) {
-                    this.addInputGroup(grp.topValue, grp.bottomValue, grp.lastTarget);
-                }, this);
-            }));
+        init: async function() {
+            this.utime = new Utime();
+            await this.utime.loadOptions();
+
+            const inputGroups = await this.loadInputGroups();
+            
+            this.currentLocation = 'app';
+            this.storeEls();
+            this.addListeners();
+            this.resize();
+            this.populateOptionsForm();
+            inputGroups.forEach((grp) => this.addInputGroup(grp.topValue, grp.bottomValue, grp.lastTarget));
 
             return this;
+        },
+
+        loadInputGroups: async function() {
+            const { inputGroups } = await chrome.storage.local.get(['inputGroups']);
+            const defaultGroups = [{id: 0, topValue: null, bottomValue: null, lastTarget: 'top'}];
+
+            this.inputGroups = inputGroups ? JSON.parse(inputGroups) : defaultGroups;
+            return this.inputGroups;
+        },
+
+        updateInputGroups: async function(newGroups) {
+            this.inputGroups = newGroups;
+            await chrome.storage.local.set({ inputGroups: JSON.stringify(newGroups) });
+        },
+
+        addInputGroupElement: async function(inputGroup) {
+            this.inputGroups = [...this.inputGroups, inputGroup];
+            await this.updateInputGroups(this.inputGroups);
+        },
+
+        removeInputGroupElement: async function(index) {
+            this.inputGroups = this.inputGroups.toSpliced(index, 1);
+            await this.updateInputGroups(this.inputGroups);
         },
 
         storeEls: function() {
@@ -41,21 +59,21 @@ var extPopup = (function() {
         },
 
         addListeners: function() {
-            this.$doc.on('click', '.open-location', this.proxy(function(e) {
+            this.$doc.on('click', '.open-location', (e) => {
                 this.open($(e.currentTarget).data('target'));
                 e.preventDefault();
-            }));
+            });
 
-            this.$appCt.on('click', '.add-input-group-btn', this.proxy(function(e) {
+            this.$appCt.on('click', '.add-input-group-btn', (e) => {
                 this.addInputGroup();
-            }));
+            });
 
-            this.$appCt.on('click', '.input-group-close-btn', this.proxy(function(e) {
+            this.$appCt.on('click', '.input-group-close-btn', (e) => {
                 var id = this.getGroupId(e.currentTarget);
                 this.removeInputGroup(id);
-            }));
+            });
 
-            this.$doc.on('keydown', this.proxy(function(e) {
+            this.$doc.on('keydown', (e) => {
                 //global keyboard shortcuts handling
                 switch(e.which) {
                     //A
@@ -66,9 +84,9 @@ var extPopup = (function() {
                         }
                         break;
                 }
-            }));
+            });
 
-            this.$appCt.on('keydown', 'input.input-group-control', this.proxy(function(e) {
+            this.$appCt.on('keydown', 'input.input-group-control', (e) => {
                 //focused input keyboard shortcut handling
                 switch(e.which) {
                     //up arrow
@@ -98,9 +116,9 @@ var extPopup = (function() {
                         }
                         break;
                 }
-            }));
+            });
 
-            this.$appCt.on('keyup', 'input.input-group-control', this.proxy(function(e) {
+            this.$appCt.on('keyup', 'input.input-group-control', (e) => {
                 var el = $(e.currentTarget),
                     newValue;
 
@@ -114,9 +132,9 @@ var extPopup = (function() {
                 }
 
                 this.updateGroup(e.currentTarget, (e.which === 13));
-            }));
+            });
 
-            this.$appCt.on('focus', 'input.input-group-control', this.proxy(function(e) {
+            this.$appCt.on('focus', 'input.input-group-control', (e) => {
                 var el = $(e.currentTarget);
 
                 if(el.hasClass('error')) {
@@ -126,11 +144,11 @@ var extPopup = (function() {
 
                 //make sure the entire contents of the input are selected on focus
                 el.select();
-            }));
+            });
 
-            this.$optionsForm.on('change', 'select.form-control', this.proxy(function(e) {
+            this.$optionsForm.on('change', 'select.form-control', (e) => {
                 this.saveOption(e.currentTarget);
-            }));
+            });
         },
 
         addInputGroup: function(topValue, bottomValue, lastTarget) {
@@ -139,7 +157,7 @@ var extPopup = (function() {
                 topInput,
                 bottomInput;
 
-            this.bgWin.inputGroups.push({
+            this.addInputGroupElement({
                 id: id,
                 topValue: topValue,
                 bottomValue: bottomValue,
@@ -178,7 +196,7 @@ var extPopup = (function() {
             }
 
             if(index > -1) {
-                this.bgWin.inputGroups.splice(index, 1);
+                this.removeInputGroupElement(index);
             }
 
             el = $('#input-group-' + id, this.$inputGroups);
@@ -208,23 +226,23 @@ var extPopup = (function() {
 
             if(target === 'top') {
                 topValue = $.trim(topInput.val());
-                if(forceUpdate === true || topValue != this.bgWin.inputGroups[groupIndex].topValue) {
+                if(forceUpdate === true || topValue != this.inputGroups[groupIndex].topValue) {
                     bottomValue = this.convertValue(topValue, 'top');
                     bottomInput.val(this.getDisplayedValue(bottomValue, 'bottom'));
                     bottomInput.toggleClass('error', (bottomValue === false));
-                    this.bgWin.inputGroups[groupIndex].topValue = topValue;
-                    this.bgWin.inputGroups[groupIndex].bottomValue = bottomValue;
-                    this.bgWin.inputGroups[groupIndex].lastTarget = 'top';
+                    this.inputGroups[groupIndex].topValue = topValue;
+                    this.inputGroups[groupIndex].bottomValue = bottomValue;
+                    this.inputGroups[groupIndex].lastTarget = 'top';
                 }
             } else {
                 bottomValue = $.trim(bottomInput.val());
-                if(forceUpdate === true || bottomValue != this.bgWin.inputGroups[groupIndex].bottomValue) {
+                if(forceUpdate === true || bottomValue != this.inputGroups[groupIndex].bottomValue) {
                     topValue = this.convertValue(bottomValue, 'bottom');
                     topInput.val(this.getDisplayedValue(topValue, 'top'));
                     topInput.toggleClass('error', (topValue === false));
-                    this.bgWin.inputGroups[groupIndex].topValue = topValue;
-                    this.bgWin.inputGroups[groupIndex].bottomValue = bottomValue;
-                    this.bgWin.inputGroups[groupIndex].lastTarget = 'bottom';
+                    this.inputGroups[groupIndex].topValue = topValue;
+                    this.inputGroups[groupIndex].bottomValue = bottomValue;
+                    this.inputGroups[groupIndex].lastTarget = 'bottom';
                 }
             }
         },
@@ -283,9 +301,9 @@ var extPopup = (function() {
         populateOptionsForm: function() {
             var opts = this.utime.getOptions();
 
-            $.each(opts, this.proxy(function(key, value) {
+            $.each(opts, (key, value) => {
                 $('#option-' + this.utime.camelToDashes(key), this.$optionsForm).val(value);
-            }));
+            });
         },
 
         saveOption: function(ctrlEl) {
@@ -300,7 +318,7 @@ var extPopup = (function() {
             this.utime.updateOption(key, value);
 
             //update all existing input groups so their output/properties reflects the new settings
-            $.each(this.bgWin.inputGroups, this.proxy(function(index, group) {
+            $.each(this.inputGroups, (index, group) => {
                 groupEl = $('#input-group-' + group.id, this.$inputGroups);
                 topInput = $('input.input-0:first', groupEl);
                 bottomInput = $('input.input-1:first', groupEl);
@@ -319,12 +337,14 @@ var extPopup = (function() {
 
                 topInput.prop('placeholder', this.getPlaceholder('top'));
                 bottomInput.prop('placeholder', this.getPlaceholder('bottom'));
-            }));
+            });
 
             //propagate changes to the background page
-            if(this.bgWin && this.bgWin.extBgPage) {
-                this.bgWin.extBgPage.utime.loadOptions();
-            }
+            chrome.runtime.sendMessage({
+                type: 'update-options',
+                target: 'background',
+                data: {}
+            });
         },
 
         open: function(location) {
@@ -343,15 +363,11 @@ var extPopup = (function() {
             this.$page.height(newHeight);
         },
 
-        proxy: function(fn) {
-            return $.proxy(fn, this);
-        },
-
         indexOfGroup: function(id) {
             var index = -1;
 
-            for(var i = 0; i < this.bgWin.inputGroups.length; i++) {
-                if(this.bgWin.inputGroups[i].id === id) {
+            for(var i = 0; i < this.inputGroups.length; i++) {
+                if(this.inputGroups[i].id === id) {
                     index = i;
                     break;
                 }
@@ -361,7 +377,7 @@ var extPopup = (function() {
         },
 
         getNextInputGroupId: function() {
-            return this.bgWin.inputGroups.length;
+            return this.inputGroups.length;
         },
 
         getGroupId: function(el) {
